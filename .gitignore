@@ -1,0 +1,38 @@
+# Secrets: never commit credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Pipeline working state (downloaded snapshots, run records, catalog cache)
+.bdh/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Internal working documents (kept locally, not published)
+BrightData_Hotdata_Functional_Specification_Document.docx.md
+Technical Specification_ Bright Data → Hotdata Integration.md
+audit.md
+dataset_id.json
+.cursorrules
