@@ -132,7 +132,7 @@ def snapshot_request(table: str = "products") -> PushRequest:
 async def test_full_run_publishes_and_records_every_stage(
     settings: Settings, bright_data: BrightDataMock, hotdata: HotdataRecorder
 ) -> None:
-    """UC-1, UC-2, UC-4, UC-5, UC-6, FR-02."""
+    """UC-1 to UC-5, FR-01 to FR-04."""
     result = await arun_pipeline(collect_request(), settings)
 
     assert result.snapshot_id == SNAPSHOT_ID
@@ -158,7 +158,7 @@ async def test_full_run_publishes_and_records_every_stage(
 async def test_failed_collection_writes_nothing(
     settings: Settings, bright_data: BrightDataMock, hotdata: HotdataRecorder
 ) -> None:
-    """UC-7, FR-07."""
+    """UC-6, FR-06: a failed collection writes nothing."""
     bright_data.status = "failed"
 
     with pytest.raises(CollectionFailedError):
@@ -175,7 +175,7 @@ async def test_failed_collection_writes_nothing(
 async def test_timeout_is_resumed_by_snapshot_id(
     settings: Settings, bright_data: BrightDataMock, hotdata: HotdataRecorder
 ) -> None:
-    """UC-8, FR-08: polling fallback when completion is not observed in time."""
+    """Acceptance criterion "defined fallback": a polling timeout resumes by snapshot id."""
     impatient = settings.model_copy(update={"poll_timeout_seconds": 0.01})
     bright_data.status = "running"
 
@@ -192,7 +192,7 @@ async def test_timeout_is_resumed_by_snapshot_id(
 async def test_failed_write_is_replayed_without_reupload(
     settings: Settings, bright_data: BrightDataMock, hotdata: HotdataRecorder
 ) -> None:
-    """UC-9, FR-09: a failed Hotdata write is logged and can be replayed."""
+    """UC-7, FR-07: a failed Hotdata write is logged and can be replayed."""
     hotdata.load_errors.append(HotdataWriteError("busy", stage="load", snapshot_id=SNAPSHOT_ID))
 
     with pytest.raises(HotdataWriteError):
@@ -214,7 +214,7 @@ async def test_failed_write_is_replayed_without_reupload(
 async def test_schema_mismatch_pauses_before_upload(
     settings: Settings, bright_data: BrightDataMock, hotdata: HotdataRecorder
 ) -> None:
-    """UC-5, UC-10, FR-06, FR-10."""
+    """UC-4, UC-8, FR-05, FR-08: a schema mismatch pauses ingestion."""
     bright_data.snapshot = ndjson({"title": "ok"}, {"title": "x", "initial_price": "cheap"})
 
     with pytest.raises(SchemaMismatchError) as excinfo:
