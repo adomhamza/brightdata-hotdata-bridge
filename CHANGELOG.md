@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Individual Contributor License Agreement (`CLA.md`), signed with a GitHub login through
+  CLA assistant and checked on every pull request.
+
 ## [0.1.0]
 
 ### Added

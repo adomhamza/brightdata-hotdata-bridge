@@ -206,4 +206,6 @@ mypy
 pytest --cov
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Licensed under [Apache-2.0](LICENSE).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Contributors sign the
+[Contributor License Agreement](CLA.md) on their first pull request. Licensed under
+[Apache-2.0](LICENSE).

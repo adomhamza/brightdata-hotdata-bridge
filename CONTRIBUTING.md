@@ -1,5 +1,19 @@
 # Contributing
 
+## Contributor License Agreement
+
+Every contributor must sign the [Individual Contributor License Agreement](CLA.md) before a pull
+request can be merged. You keep the copyright to your work; the agreement grants the project a
+licence to use it.
+
+When you open your first pull request, [CLA assistant](https://cla-assistant.io) comments with a
+link. Follow it, sign in with GitHub, enter your full legal name and email, and accept. The
+`license/cla` check on the pull request then passes.
+
+You only sign once; later pull requests pass the check automatically unless the agreement changes.
+If your employer has rights to your work, get its permission before signing (see section 4 of the
+agreement).
+
 ## Set up
 
 ```bash
