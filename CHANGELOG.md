@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1]
+
+### Fixed
+
+- Release workflow reads `__version__` from `__about__.py`, so the tag check matches the package version.
+
 ## [0.1.0]
 
 ### Added
