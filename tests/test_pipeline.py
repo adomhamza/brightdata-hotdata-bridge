@@ -324,7 +324,7 @@ def test_blocking_wrapper_runs_the_pipeline(
         settings=settings,
     )
 
-    assert result.rows_published == 2
+    assert result.row_count == result.rows_published == 2
     assert bright_data.trigger.calls.last.request.read() == (
         b'{"input":[{"url":"https://amazon.com/dp/1"}]}'
     )

@@ -279,3 +279,8 @@ class PushResult(BaseModel):
     rows_rejected: int
     table_row_count: int
     already_loaded: bool = False
+
+    @property
+    def row_count(self) -> int:
+        """Rows this run loaded into Hotdata; the same as ``rows_published``."""
+        return self.rows_published

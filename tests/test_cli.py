@@ -13,9 +13,10 @@ from typer.testing import CliRunner
 from brightdata_hotdata_bridge import cli
 from brightdata_hotdata_bridge.__about__ import __version__
 from brightdata_hotdata_bridge.cli import app
-from brightdata_hotdata_bridge.errors import ConfigurationError
+from brightdata_hotdata_bridge.errors import ConfigurationError, HotdataWriteError
 from brightdata_hotdata_bridge.models import HotdataDatabase
-from tests.conftest import AMAZON_ID, SNAPSHOT_ID
+from brightdata_hotdata_bridge.state import run_paths
+from tests.conftest import AMAZON_ID, SNAPSHOT_ID, ndjson
 from tests.test_pipeline import BrightDataMock, HotdataRecorder
 
 runner = CliRunner()
@@ -142,6 +143,75 @@ def test_failed_collection_exits_5_with_recovery_hint(
     assert result.exit_code == 5
     assert f"bdh status {SNAPSHOT_ID}" in result.output
     assert hotdata.uploads == []
+
+
+def test_status_shows_remote_status_and_local_stage(
+    bright_data: BrightDataMock, hotdata: HotdataRecorder
+) -> None:
+    """UC-2: monitor a collection."""
+    pushed = runner.invoke(app, ["push", "-s", SNAPSHOT_ID, "-t", "products"])
+    as_json = runner.invoke(app, ["status", SNAPSHOT_ID, "--json"])
+    as_table = runner.invoke(app, ["status", SNAPSHOT_ID])
+
+    assert pushed.exit_code == 0, pushed.output
+    payload = json.loads(as_json.stdout)
+    assert payload["progress"]["status"] == "ready"
+    assert payload["record"]["stage"] == "loaded"
+    assert as_table.exit_code == 0, as_table.output
+    assert "Bright Data status" in as_table.stdout
+    assert "loaded" in as_table.stdout
+
+
+def test_timeout_exits_6_and_replay_resumes(
+    monkeypatch: pytest.MonkeyPatch, bright_data: BrightDataMock, hotdata: HotdataRecorder
+) -> None:
+    """Polling timeout: exit 6, then `bdh replay` resumes without a second trigger."""
+    monkeypatch.setenv("BDH_POLL_TIMEOUT_SECONDS", "0.01")
+    bright_data.status = "running"
+
+    timed_out = runner.invoke(app, ["push", "-d", AMAZON_ID, "-q", "https://a.com/x", "-t", "p"])
+    uploads_after_timeout = list(hotdata.uploads)
+    bright_data.status = "ready"
+    resumed = runner.invoke(app, ["replay", SNAPSHOT_ID, "--json"])
+
+    assert timed_out.exit_code == 6
+    assert f"bdh replay {SNAPSHOT_ID}" in timed_out.output
+    assert uploads_after_timeout == []
+    assert resumed.exit_code == 0, resumed.output
+    assert json.loads(resumed.stdout)["table"] == "p"
+    assert bright_data.trigger.call_count == 1
+
+
+def test_schema_mismatch_exits_7_and_writes_report(
+    tmp_path: Path, bright_data: BrightDataMock, hotdata: HotdataRecorder
+) -> None:
+    """UC-8: a schema mismatch pauses ingestion and points to the report."""
+    bright_data.snapshot = ndjson({"title": "x", "initial_price": "cheap"})
+
+    result = runner.invoke(app, ["push", "-d", AMAZON_ID, "-q", "https://a.com/x", "-t", "p"])
+
+    assert result.exit_code == 7
+    assert "Report:" in result.output
+    assert run_paths(tmp_path / "state", SNAPSHOT_ID).report.exists()
+    assert hotdata.uploads == []
+
+
+def test_failed_write_exits_8_then_replay_publishes(
+    bright_data: BrightDataMock, hotdata: HotdataRecorder
+) -> None:
+    """UC-7: a failed Hotdata write is reported, shown by `bdh status` and replayed."""
+    hotdata.load_errors.append(HotdataWriteError("busy", stage="load", snapshot_id=SNAPSHOT_ID))
+
+    failed = runner.invoke(app, ["push", "-d", AMAZON_ID, "-q", "https://a.com/x", "-t", "p"])
+    inspected = runner.invoke(app, ["status", SNAPSHOT_ID])
+    replayed = runner.invoke(app, ["replay", SNAPSHOT_ID, "--json"])
+
+    assert failed.exit_code == 8
+    assert f"bdh replay {SNAPSHOT_ID}" in failed.output
+    assert "load: busy" in inspected.stdout
+    assert replayed.exit_code == 0, replayed.output
+    assert json.loads(replayed.stdout)["upload_id"] == "upl_1"
+    assert len(hotdata.uploads) == 1
 
 
 def test_bad_csv_exits_3_and_lists_issues(tmp_path: Path, bright_data: BrightDataMock) -> None:

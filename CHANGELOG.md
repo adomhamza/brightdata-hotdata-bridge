@@ -6,15 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-### Added
-
-- Individual Contributor License Agreement (`CLA.md`), signed with a GitHub login through
-  CLA assistant and checked on every pull request.
-
 ## [0.1.0]
 
 ### Added
 
+- `NOTICE` file for the Apache-2.0 license, shipped in the wheel and sdist.
+- Individual Contributor License Agreement (`CLA.md`), signed with a GitHub login through
+  CLA assistant and checked on every pull request.
+- `PushResult.row_count`: rows loaded by the run (the same as `rows_published`).
+- `docs/` with setup, configuration, usage, troubleshooting and architecture pages.
+- `examples/push_with_library.py`: end-to-end library use with handling for each failure.
+- `SECURITY.md` (private vulnerability reporting), `CODE_OF_CONDUCT.md` (Contributor
+  Covenant 2.1), and issue and pull request templates.
 - End-to-end pipeline: trigger a Bright Data collection, poll until ready, stream the
   snapshot, validate it, upload it to Hotdata object storage and load it into a table.
 - Support for any scraper in Bright Data's catalog, with CSV inputs validated against

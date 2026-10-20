@@ -12,6 +12,10 @@ inputs.csv ─► Bright Data trigger ─► poll until ready ─► download ND
            ─► validate against the scraper schema ─► Hotdata upload ─► table load
 ```
 
+Full documentation is in [`docs/`](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/docs/README.md): [setup](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/docs/setup.md),
+[configuration](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/docs/configuration.md), [usage](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/docs/usage.md),
+[troubleshooting](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/docs/troubleshooting.md) and [architecture](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/docs/architecture.md).
+
 ## Features
 
 - **Any Bright Data scraper.** Dataset ids and their inputs are checked against Bright
@@ -29,7 +33,7 @@ inputs.csv ─► Bright Data trigger ─► poll until ready ─► download ND
   a failed write or a fixed schema problem is resumed with `bdh replay`, and a run is
   never loaded twice.
 - **Polite to the APIs.** Honours `Retry-After` with exponential backoff, and only
-  retries non-idempotent requests when they provably never reached the server.
+  retries a Bright Data trigger when it provably never reached the server.
 
 ## Install
 
@@ -56,7 +60,7 @@ workspace has exactly one database it is used automatically; if it has several, 
 run records the database it used, so `bdh replay` always publishes to the same place.
 
 Optional settings (schema, polling interval and timeout, state directory, catalog
-source) are documented in [`.env.example`](.env.example). The library and the CLI read
+source) are documented in [`.env.example`](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/.env.example). The library and the CLI read
 the same configuration.
 
 ## CLI
@@ -153,8 +157,11 @@ result = push_snapshot_to_hotdata(
     input_file="urls.csv",
     table_name="amazon_products",
 )
-print(f"{result.rows_published} rows published; table now has {result.table_row_count}")
+print(f"Loaded {result.row_count} rows; the table now has {result.table_row_count}")
 ```
+
+[`examples/push_with_library.py`](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/examples/push_with_library.py) shows how to handle each
+failure.
 
 Async code (FastAPI, notebooks, orchestrators) should use the async API:
 
@@ -206,6 +213,7 @@ mypy
 pytest --cov
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Contributors sign the
-[Contributor License Agreement](CLA.md) on their first pull request. Licensed under
-[Apache-2.0](LICENSE).
+See [CONTRIBUTING.md](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/CONTRIBUTING.md) and the [Code of Conduct](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/CODE_OF_CONDUCT.md). Report
+security problems privately as described in [SECURITY.md](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/SECURITY.md). Contributors sign the
+[Contributor License Agreement](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/CLA.md) on their first pull request. Licensed under
+[Apache-2.0](https://github.com/adomhamza/brightdata-hotdata-bridge/blob/main/LICENSE).

@@ -51,7 +51,9 @@ pytest --cov
 
 - Never commit credentials, API keys, tokens or `.env` files. Configuration comes from the
   environment or a secrets manager.
-- Report vulnerabilities privately to the maintainers rather than in a public issue.
+- Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md), never in a
+  public issue.
+- Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Releasing
 
