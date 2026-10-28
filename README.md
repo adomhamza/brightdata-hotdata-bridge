@@ -1,11 +1,20 @@
 # brightdata-hotdata-bridge
 
-Collect web data with [Bright Data](https://brightdata.com) scrapers and publish it into
-[Hotdata](https://www.hotdata.dev) tables, from Python or the `bdh` command line.
+A lot of useful questions depend on data from the web, like product prices, reviews, or
+job listings. [Bright Data](https://brightdata.com) is one of the most widely used ways
+to collect that data, with a catalog of more than 1,200 ready-made scrapers for sites
+like Amazon and LinkedIn. The community-built `brightdata-hotdata-bridge` loads what
+those scrapers collect straight into [Hotdata](https://www.hotdata.dev) tables, from
+Python or the `bdh` command line, where agents and applications can query it with SQL.
 
-Give it a scraper's dataset id and a CSV of URLs (or keywords, usernames, and so on).
-It triggers the collection, waits for it, validates the records, and loads them into a
-Hotdata table.
+You give the bridge a scraper's dataset id and a CSV of inputs, such as URLs, search
+keywords, or usernames. It starts the collection on Bright Data, waits for it to finish,
+checks the records, and loads them into a Hotdata table. It works with any scraper in
+the catalog, whether it collects specific URLs or discovers results by keyword or
+category. Inputs are checked against the scraper's requirements before a paid collection
+starts, so a bad CSV costs nothing. Records are checked against the scraper's output
+schema before anything is written, and records Bright Data flags as errors are set aside
+instead of loaded.
 
 ```text
 inputs.csv ─► Bright Data trigger ─► poll until ready ─► download NDJSON
