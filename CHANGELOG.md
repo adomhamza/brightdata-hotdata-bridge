@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2]
+
+### Changed
+
+- README opening explains the Bright Data → Hotdata bridge, how inputs drive a collection,
+  and the checks that run before a paid job or a table write.
+
 ## [0.1.1]
 
 ### Fixed
